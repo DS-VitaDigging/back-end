@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false, unique = true)
+    private String id;
 
     @Column(nullable = false)
     private String name; // nickname
@@ -35,13 +35,15 @@ public class UserEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 테스트용 생성자
-    public UserEntity(String name) {
-        this.name = name;
+    // 로그인용
+    public UserEntity(String id, String password) {
+        this.id = id;
+        this.password = password;
     }
 
-    // 사용자 생성용 생성자
-    public UserEntity(String name, String password, String email, int birth, String gender) {
+    // 회원가입용
+    public UserEntity(String id, String name, String password, String email, int birth, String gender) {
+        this.id = id;
         this.name = name;
         this.password = password;
         this.email = email;
