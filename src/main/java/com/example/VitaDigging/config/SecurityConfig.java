@@ -22,7 +22,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/member/signup", "/api/member/login", "/api/member/checkId").permitAll()
+                        .requestMatchers("/api/products/**",       // ✅ 테스트 중 허용할 URL
+                                "/api/surveys/**",        // ✅ 테스트 중 허용할 URL
+                                "/api/recommendations/**",// ✅ 테스트 중 허용할 URL
+                                "/api/member/signup", "/api/member/login", "/api/member/checkId").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class)  // JWT 필터 추가
