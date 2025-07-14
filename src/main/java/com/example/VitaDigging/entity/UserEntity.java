@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,7 +27,7 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = false)
-    private int birth;
+    private LocalDate birth;
 
     @Column(nullable = false)
     private String gender;
@@ -42,7 +43,7 @@ public class UserEntity {
     }
 
     // 회원가입용
-    public UserEntity(String id, String name, String password, String email, int birth, String gender) {
+    public UserEntity(String id, String name, String password, String email, LocalDate birth, String gender) {
         this.id = id;
         this.name = name;
         this.password = password;

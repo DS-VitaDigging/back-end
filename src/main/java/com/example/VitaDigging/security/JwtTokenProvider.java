@@ -70,7 +70,7 @@ public class JwtTokenProvider {
     // 토큰에서 Claims 추출
     private Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
