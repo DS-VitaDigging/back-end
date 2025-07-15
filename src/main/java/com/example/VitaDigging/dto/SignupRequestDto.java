@@ -3,6 +3,8 @@ package com.example.VitaDigging.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
 @ToString
 @Getter
@@ -12,7 +14,7 @@ import lombok.*;
 public class SignupRequestDto {
 
     @NotBlank(message = "아이디를 입력해주세요")
-    @Pattern(regexp = "^[a-zA-Z0-9가-힣]+$", message = "아이디는 영어, 한글, 숫자만 사용하세요.")
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영어, 숫자만 사용하세요.")
     private String id;
 
     @NotBlank(message = "비밀번호를 입력해주세요")
@@ -30,7 +32,7 @@ public class SignupRequestDto {
     private String email;
 
     @NotNull(message = "생년월일을 입력해주세요")
-    private Integer birth;
+    private LocalDate birth;
 
     @NotBlank(message = "성별을 입력해주세요")
     private String gender;
