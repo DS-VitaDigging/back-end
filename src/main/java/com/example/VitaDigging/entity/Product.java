@@ -15,6 +15,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     private String category;
@@ -36,5 +37,8 @@ public class Product {
 
     @Column(columnDefinition = "TEXT")
     private String purchaseLink;
+
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
 }
 
