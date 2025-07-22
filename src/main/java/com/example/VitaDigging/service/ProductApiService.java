@@ -7,11 +7,19 @@ import com.example.VitaDigging.repository.ProductRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Connection;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+import org.jsoup.nodes.Element;
+
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +33,7 @@ public class ProductApiService {
     public void fetchAndSaveProducts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://openapi.foodsafetykorea.go.kr/api/" + API_KEY +
-                "/I0030/json/1/30";
+                "/I0030/json/1/5";
 
         String json = restTemplate.getForObject(url, String.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -33,12 +41,21 @@ public class ProductApiService {
         JsonNode items = root.path("I0030").path("row");
 
         for (JsonNode item : items) {
+
+            String name = item.path("PRDLST_NM").asText();
+            // 🔒 이미 존재하는 제품은 건너뜀
+            if (productRepository.existsByName(name)) {
+                continue;
+            }
+
             ProductDto dto = new ProductDto();
-            dto.setName(item.path("PRDLST_NM").asText());
+            dto.setName(name);
             dto.setEfficacy(item.path("PRIMARY_FNCLTY").asText());
             dto.setIngredients(item.path("RAWMTRL_NM").asText());
             dto.setInstructions(item.path("NTK_MTHD").asText());
             dto.setPrecautions(item.path("IFTKN_ATNT_MATR_CN").asText());
+            dto.setManufacturer(item.path("BSSH_NM").asText());
+
 
             // 🔄 카테고리 매핑 예시
             dto.setCategory(mapCategoryByFunction(dto.getEfficacy()));
@@ -48,6 +65,7 @@ public class ProductApiService {
             dto.setPurchaseLink("https://search.shopping.naver.com/search/all?query=" + encoded);
 
             // Product 저장
+//            String imageUrl = fetchImageFromGoogle(dto.getName());
             Product product = Product.builder()
                     .name(dto.getName())
                     .category(dto.getCategory())
@@ -55,7 +73,9 @@ public class ProductApiService {
                     .ingredients(dto.getIngredients())
                     .instructions(dto.getInstructions())
                     .precautions(dto.getPrecautions())
+                    .manufacturer(dto.getManufacturer())
                     .purchaseLink(dto.getPurchaseLink())
+//                    .imageUrl(imageUrl)  // 🖼️ 이미지 저장
                     .build();
 
             productRepository.save(product);
@@ -86,4 +106,5 @@ public class ProductApiService {
 
         return "기타";
     }
+
 }

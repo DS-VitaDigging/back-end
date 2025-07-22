@@ -35,6 +35,10 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.12.3")
 	implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
+	//jsoup
+	implementation ("org.jsoup:jsoup:1.16.1")
+
 }
 
 tasks.withType<Test> {
