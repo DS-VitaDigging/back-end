@@ -27,4 +27,5 @@ public class ProductDto {
     private String manufacturer;
 
     private String purchaseLink;
+    private String imageUrl;
 }
