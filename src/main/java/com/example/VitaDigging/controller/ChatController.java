@@ -1,5 +1,6 @@
 package com.example.VitaDigging.controller;
 
+import com.example.VitaDigging.dto.ChatRequestDto;
 import com.example.VitaDigging.service.ChatGptService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +16,14 @@ public class ChatController {
         this.chatGptService = chatGptService;
     }
 
+//    @PostMapping
+//    public String ask(@RequestBody Map<String, String> request) throws Exception {
+//        String message = request.get("message");
+//        return chatGptService.ask(message);
+//    }
     @PostMapping
-    public String ask(@RequestBody Map<String, String> request) throws Exception {
-        String message = request.get("message");
-        return chatGptService.ask(message);
+    public String ask(@RequestBody ChatRequestDto requestDto) throws Exception {
+        return chatGptService.ask(requestDto.getMessages());
     }
 }
 

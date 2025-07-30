@@ -1,5 +1,6 @@
 package com.example.VitaDigging.service;
 
+import com.example.VitaDigging.dto.MessageDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,23 @@ public class ChatGptService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String ask(String message) throws Exception {
+
+    public String ask(List<MessageDto> messages) throws Exception {
+        List<Map<String, String>> chatMessages = new ArrayList<>();
+
+        for (MessageDto m : messages) {
+            chatMessages.add(Map.of("role", m.getRole(), "content", m.getContent()));
+        }
+
+        // system 프롬프트를 제일 앞에 넣음
+        chatMessages.add(0, Map.of(
+                "role", "system",
+                "content", "당신은 건강 상태를 바탕으로 영양제를 추천해주는 AI입니다. 순차적으로 질환 → 식습관 → 운동량 → 복용약 → 원하는 카테고리를 질문하세요."
+        ));
+
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o",
-                "messages", List.of(Map.of("role", "user", "content", message))
+                "messages", chatMessages
         );
 
         String body = objectMapper.writeValueAsString(requestBody);
@@ -41,4 +55,5 @@ public class ChatGptService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
+
 }
