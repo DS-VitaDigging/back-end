@@ -33,7 +33,7 @@ public class ProductApiService {
     public void fetchAndSaveProducts() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://openapi.foodsafetykorea.go.kr/api/" + API_KEY +
-                "/I0030/json/1/5";
+                "/I0030/json/1/50";
 
         String json = restTemplate.getForObject(url, String.class);
         ObjectMapper mapper = new ObjectMapper();
@@ -64,8 +64,10 @@ public class ProductApiService {
             String encoded = URLEncoder.encode(dto.getName(), StandardCharsets.UTF_8);
             dto.setPurchaseLink("https://search.shopping.naver.com/search/all?query=" + encoded);
 
+            // 임시 기본 이미지 URL 설정
+            dto.setImageUrl("https://your-default-thumbnail.com/noimage.jpg");
+
             // Product 저장
-//            String imageUrl = fetchImageFromGoogle(dto.getName());
             Product product = Product.builder()
                     .name(dto.getName())
                     .category(dto.getCategory())
@@ -75,7 +77,7 @@ public class ProductApiService {
                     .precautions(dto.getPrecautions())
                     .manufacturer(dto.getManufacturer())
                     .purchaseLink(dto.getPurchaseLink())
-//                    .imageUrl(imageUrl)  // 🖼️ 이미지 저장
+                    .imageUrl(dto.getImageUrl())  // 🖼️ 수동 이미지 삽입
                     .build();
 
             productRepository.save(product);
