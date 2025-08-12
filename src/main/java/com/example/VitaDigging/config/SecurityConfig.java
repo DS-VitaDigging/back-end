@@ -11,6 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -21,16 +26,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/products/**",       // ✅ 테스트 중 허용할 URL
-                                "/api/recommendations/**",// ✅ 테스트 중 허용할 URL
-                                "/api/member/signup", "/api/member/login", "/api/member/checkId").permitAll()
-                        .requestMatchers("/api/surveys/**").authenticated() // ✅ 수정!
-                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 적용
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/products/**",
+                                "/api/recommendations/**",
+                                "/api/member/signup",
+                                "/api/member/login",
+                                "/api/member/checkId").permitAll()
+                        .requestMatchers("/api/surveys/**").authenticated()
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class)  // JWT 필터 추가
-                .csrf((auth) -> auth.disable())
+                        UsernamePasswordAuthenticationFilter.class)
                 .build();
+    }
+
+    // CORS 설정 추가
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
