@@ -11,14 +11,16 @@ import java.util.List;
 
 public interface ProductViewRepository extends JpaRepository<ProductView, Long> {
 
-    // 연령대별 인기 제품 TOP 5 조회 (조회수 기준)
-    @Query(value = "SELECT * FROM products p " +
-            "WHERE p.id IN ( " +
-            "  SELECT product_id FROM product_view " +
-            "  WHERE age_group = :ageGroup " +
-            "  GROUP BY product_id " +
-            "  ORDER BY COUNT(id) DESC " +
-            ")", nativeQuery = true)
+    // 연령대별 인기 제품 조회 (조회수 기준, Pageable 적용 가능)
+    @Query(value = "SELECT p.* FROM products p " +
+            "JOIN product_view v ON p.id = v.product_id " +
+            "WHERE v.age_group = :ageGroup " +
+            "GROUP BY p.id " +
+            "ORDER BY COUNT(v.id) DESC \n-- #pageable\n",
+            countQuery = "SELECT COUNT(DISTINCT p.id) FROM products p " +
+                    "JOIN product_view v ON p.id = v.product_id " +
+                    "WHERE v.age_group = :ageGroup",
+            nativeQuery = true)
     List<Product> findPopularByAgeGroup(@Param("ageGroup") String ageGroup, Pageable pageable);
 }
 
