@@ -12,7 +12,7 @@ public class SurveyService {
 
     private final SurveyRepository surveyRepository;
 
-    public void saveSurvey(Long userId, SurveyRequestDto dto) {
+    public void saveSurvey(String userId, SurveyRequestDto dto) {
         Survey survey = Survey.builder()
                 .userId(userId)
                 .height(dto.getHeight())

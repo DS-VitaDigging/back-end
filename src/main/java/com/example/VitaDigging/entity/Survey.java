@@ -18,7 +18,7 @@ public class Survey {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private String userId;
 
     private Integer height;
     private Integer weight;
