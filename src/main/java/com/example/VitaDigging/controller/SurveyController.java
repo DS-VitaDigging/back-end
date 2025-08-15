@@ -24,8 +24,7 @@ public class SurveyController {
             throw new RuntimeException("로그인 정보가 없습니다.");
         }
 
-        Long userId = Long.parseLong(user.getUserId());
-        surveyService.saveSurvey(userId, dto);
+        surveyService.saveSurvey(user.getUserId(), dto);
         return ResponseEntity.ok(Map.of("message", "신체 정보가 저장되었습니다."));
     }
 }
