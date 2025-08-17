@@ -7,8 +7,10 @@ import com.example.VitaDigging.security.CustomUser;
 import com.example.VitaDigging.service.ChatGptService;
 import com.example.VitaDigging.service.RecommendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
