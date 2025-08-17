@@ -1,6 +1,9 @@
 package com.example.VitaDigging.controller;
 
 import com.example.VitaDigging.dto.ChatRequestDto;
+import com.example.VitaDigging.entity.Survey;
+import com.example.VitaDigging.repository.SurveyRepository;
+import com.example.VitaDigging.security.CustomUser;
 import com.example.VitaDigging.service.ChatGptService;
 import com.example.VitaDigging.service.RecommendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
