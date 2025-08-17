@@ -4,7 +4,6 @@ import com.example.VitaDigging.dto.ChatRequestDto;
 import com.example.VitaDigging.service.ChatGptService;
 import com.example.VitaDigging.service.RecommendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
