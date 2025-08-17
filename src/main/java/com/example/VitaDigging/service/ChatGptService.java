@@ -46,6 +46,7 @@ public class ChatGptService {
 
         chatMessages.add(0, Map.of("role", "system", "content", systemPrompt));
 
+
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o",
                 "messages", chatMessages
