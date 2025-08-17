@@ -7,17 +7,13 @@ import com.example.VitaDigging.security.CustomUser;
 import com.example.VitaDigging.service.ChatGptService;
 import com.example.VitaDigging.service.RecommendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/chat")
 public class ChatController {
 
@@ -25,7 +21,15 @@ public class ChatController {
     private final SurveyRepository surveyRepository;
     private final RecommendService recommendService;
 
-    // 1. 일반 챗봇 기능 (GPT 호출만)
+    public ChatController(ChatGptService chatGptService,
+                          SurveyRepository surveyRepository,
+                          RecommendService recommendService) {
+        this.chatGptService = chatGptService;
+        this.surveyRepository = surveyRepository;
+        this.recommendService = recommendService;
+    }
+
+    // 1. 일반 챗봇 기능 (신체 정보 기반 GPT 호출)
     @PostMapping
     public String chat(@RequestBody ChatRequestDto requestDto,
                        @AuthenticationPrincipal CustomUser user) throws Exception {

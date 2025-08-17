@@ -25,7 +25,10 @@ public class ChatGptService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // GPT 호출
+    @Autowired
+    private RecommendService recommendService;
+
+    // 1. GPT 호출 (신체 정보 기반)
     public String ask(List<MessageDto> messages, Integer height, Integer weight) throws Exception {
         List<Map<String, String>> chatMessages = new ArrayList<>();
 
@@ -33,7 +36,7 @@ public class ChatGptService {
             chatMessages.add(Map.of("role", m.getRole(), "content", m.getContent()));
         }
 
-        // 동적 system prompt (신체 정보 + JSON 응답 규칙)
+        // system prompt (신체 정보 + JSON 응답 규칙)
         String systemPrompt = String.format(
                 "당신은 건강 상태를 바탕으로 영양제를 추천해주는 AI입니다. " +
                         "사용자의 신체 정보는 키 %dcm, 몸무게 %dkg입니다. " +
@@ -45,7 +48,6 @@ public class ChatGptService {
         );
 
         chatMessages.add(0, Map.of("role", "system", "content", systemPrompt));
-
 
         Map<String, Object> requestBody = Map.of(
                 "model", "gpt-4o",
@@ -65,13 +67,46 @@ public class ChatGptService {
         return response.body();
     }
 
-    @Autowired
-    private RecommendService recommendService;
+    // 2. GPT 호출 (신체 정보 없는 단순 버전, 필요시)
+    public String ask(List<MessageDto> messages) throws Exception {
+        List<Map<String, String>> chatMessages = new ArrayList<>();
 
-    // GPT 응답 파싱 + 추천 서비스 호출
+        for (MessageDto m : messages) {
+            chatMessages.add(Map.of("role", m.getRole(), "content", m.getContent()));
+        }
+
+        Map<String, Object> requestBody = Map.of(
+                "model", "gpt-4o",
+                "messages", chatMessages
+        );
+
+        String body = objectMapper.writeValueAsString(requestBody);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.openai.com/v1/chat/completions"))
+                .header("Authorization", "Bearer " + apiKey)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    // 3. GPT 응답 파싱 + 추천 서비스 호출 (신체 정보 기반)
     public List<Map<String, Object>> askAndRecommend(List<MessageDto> messages, Integer height, Integer weight) throws Exception {
         String gptResponse = ask(messages, height, weight);
+        return parseAndRecommend(gptResponse);
+    }
 
+    // 4. GPT 응답 파싱 + 추천 서비스 호출 (단순 버전)
+    public List<Map<String, Object>> askAndRecommend(List<MessageDto> messages) throws Exception {
+        String gptResponse = ask(messages);
+        return parseAndRecommend(gptResponse);
+    }
+
+    // 내부 공통 파싱 로직
+    private List<Map<String, Object>> parseAndRecommend(String gptResponse) throws Exception {
         // 1. GPT 응답 JSON 파싱
         Map<String, Object> gptMap = objectMapper.readValue(gptResponse, Map.class);
         List<Map<String, Object>> choices = (List<Map<String, Object>>) gptMap.get("choices");
