@@ -4,6 +4,8 @@ import com.example.VitaDigging.dto.ChatRequestDto;
 import com.example.VitaDigging.service.ChatGptService;
 import com.example.VitaDigging.service.RecommendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,21 +16,36 @@ import java.util.Map;
 public class ChatController {
 
     private final ChatGptService chatGptService;
+    private final SurveyRepository surveyRepository;
     private final RecommendService recommendService;
 
-    public ChatController(ChatGptService chatGptService, RecommendService recommendService) {
+    public ChatController(ChatGptService chatGptService,
+                          SurveyRepository surveyRepository,
+                          RecommendService recommendService) {
         this.chatGptService = chatGptService;
+        this.surveyRepository = surveyRepository;
         this.recommendService = recommendService;
     }
 
-
-    // 1. 일반 챗봇 기능 (GPT 호출만)
+    // 1. 일반 챗봇 기능 (신체 정보 기반 GPT 호출)
     @PostMapping
-    public String ask(@RequestBody ChatRequestDto requestDto) throws Exception {
-        return chatGptService.ask(requestDto.getMessages());
+    public String chat(@RequestBody ChatRequestDto requestDto,
+                       @AuthenticationPrincipal CustomUser user) throws Exception {
+
+        // 로그인한 사용자 ID 가져오기
+        String userId = user.getUserId();
+
+        // DB에서 가장 최근 신체 정보 조회
+        Survey survey = surveyRepository.findFirstByUserIdOrderByIdDesc(userId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "신체 정보가 없습니다. 먼저 /api/surveys/body로 입력해주세요."
+                ));
+
+        // GPT 호출
+        return chatGptService.ask(requestDto.getMessages(), survey.getHeight(), survey.getWeight());
     }
 
-
+    // 2. GPT 결과 기반 추천
     @PostMapping("/recommend")
     public List<Map<String, Object>> recommendFromGptResult(@RequestBody Map<String, Object> gptBody) throws Exception {
         // 1. GPT 전체 JSON에서 content 추출
@@ -57,5 +74,4 @@ public class ChatController {
         // 4. 추천 서비스 호출
         return recommendService.getRecommendations(vitamins);
     }
-
 }
