@@ -10,4 +10,5 @@ public class ProfilesResponseDto {
     private String age; // 출력 형식: 나이(만 나이)
     private String id;
     private String email;
+    private String gender;
 }

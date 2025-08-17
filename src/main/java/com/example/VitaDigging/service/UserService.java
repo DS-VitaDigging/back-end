@@ -83,7 +83,8 @@ public class UserService {
                 user.getName(),
                 age,
                 user.getId(),
-                user.getEmail()
+                user.getEmail(),
+                user.getGender()
         );
     }
 
