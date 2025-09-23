@@ -12,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
+import org.springframework.context.annotation.Lazy;
 
 @Service
 public class ChatGptService {
@@ -26,6 +27,7 @@ public class ChatGptService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
+    @Lazy
     private RecommendService recommendService;
 
     // 1. GPT 호출 (신체 정보 기반)
