@@ -33,7 +33,10 @@ public class SecurityConfig {
                                 "/api/recommendations/**",
                                 "/api/member/signup",
                                 "/api/member/login",
-                                "/api/member/checkId").permitAll()
+                                "/api/member/checkId",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/surveys/**").authenticated()
                         .anyRequest().authenticated()
                 )
