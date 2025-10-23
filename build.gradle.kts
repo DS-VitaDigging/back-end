@@ -39,6 +39,9 @@ dependencies {
 	//jsoup
 	implementation ("org.jsoup:jsoup:1.16.1")
 
+	//swagger
+	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+
 }
 
 tasks.withType<Test> {
